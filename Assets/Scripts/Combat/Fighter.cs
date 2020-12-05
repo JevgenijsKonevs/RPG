@@ -1,6 +1,7 @@
 using UnityEngine;
 using RPG.Movement;
 using RPG.Core;
+using RPG.Combat;
 
 namespace RPG.Combat
 {
@@ -8,6 +9,7 @@ namespace RPG.Combat
     {   // adding fields for adjusting the figher`s combat qualities
         [SerializeField] float weaponRange = 2f;
         [SerializeField] float timeBetweenAttacks = 1f;
+        [SerializeField] float weaponDamage = 5f;
         Transform target;
         float timeSinceLastAttack = 0;
         private void Update()
@@ -28,14 +30,22 @@ namespace RPG.Combat
 
         }
         // function to start the attack
-        private static void AttackBehaviour()
+        private void AttackBehaviour()
         {
             if (timeSinceLastAttack > timeBetweenAttacks)
-            {
+            {   // This will trigger Hit()
                 GetComponent<Animator>().SetTrigger("attack");
                 timeSinceLastAttack = 0;
+
             }
 
+        }
+        // Animation Event (fix for Unity error)
+        void Hit()
+        {
+            // dealing damage to target
+            Health healthComponent = target.GetComponent<Health>();
+            healthComponent.TakeDamage(weaponDamage);
         }
 
         // function to calculate and compare the distance value from player`s position, target`s position and the range of weapon
@@ -54,10 +64,6 @@ namespace RPG.Combat
         {
             target = null;
         }
-        // Animation Event (fix for Unity error)
-        void Hit()
-        {
 
-        }
     }
 }
