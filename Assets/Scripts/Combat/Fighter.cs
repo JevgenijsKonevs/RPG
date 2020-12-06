@@ -11,7 +11,7 @@ namespace RPG.Combat
         [SerializeField] float timeBetweenAttacks = 1f;
         [SerializeField] float weaponDamage = 5f;
         Health target;
-        float timeSinceLastAttack = 0;
+        float timeSinceLastAttack = Mathf.Infinity;
         private void Update()
         {
             timeSinceLastAttack += Time.deltaTime;
@@ -37,17 +37,24 @@ namespace RPG.Combat
             transform.LookAt(target.transform);
             if (timeSinceLastAttack > timeBetweenAttacks)
             {   // This will trigger Hit()
-                GetComponent<Animator>().SetTrigger("attack");
+               TriggerAttack();
                 timeSinceLastAttack = 0;
 
             }
 
         }
+        private void TriggerAttack()
+        {
+            GetComponent<Animator>().ResetTrigger("stopAttack");
+            GetComponent<Animator>().SetTrigger("attack");
+        }
         // Animation Event (fix for Unity error)
         void Hit()
         {
+            if (target == null) {
+                return;
+            }
             // dealing damage to target
-
             target.TakeDamage(weaponDamage);
         }
 
@@ -57,7 +64,7 @@ namespace RPG.Combat
             return Vector3.Distance(transform.position, target.transform.position) < weaponRange;
         }
 
-        public void Attack(CombatTarget combatTarget)
+        public void Attack(GameObject combatTarget)
         {
             GetComponent<ActionSchedule>().StartAction(this);
             target = combatTarget.GetComponent<Health>();
@@ -65,12 +72,18 @@ namespace RPG.Combat
         }
         public void Cancel()
         {
-            GetComponent<Animator>().SetTrigger("stopAttack");
+            StopAttack();
             target = null;
+        }
+        // Stop the attack after the movement
+        public void StopAttack()
+        {
+            GetComponent<Animator>().ResetTrigger("attack");
+            GetComponent<Animator>().SetTrigger("stopAttack");
         }
         
         // fix to check if it is possible to attack the enemy
-        public bool CanAttack(CombatTarget combatTarget)
+        public bool CanAttack(GameObject combatTarget)
         {
             if (combatTarget == null)
             {

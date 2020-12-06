@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace RPG.Combat
+namespace RPG.Core
 {
     public class Health : MonoBehaviour
     {   // implementing Health field for enemy and setting it to 100
@@ -28,6 +28,7 @@ namespace RPG.Combat
             if (isDead) return;
             isDead = true;
             GetComponent<Animator>().SetTrigger("die");
+            GetComponent<ActionSchedule>().CancelCurrentAction();
         }
     }
 }
