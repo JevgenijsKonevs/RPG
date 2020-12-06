@@ -33,6 +33,8 @@ namespace RPG.Combat
         // function to start the attack
         private void AttackBehaviour()
         {
+            // look at the enemy. Rotate vector 
+            transform.LookAt(target.transform);
             if (timeSinceLastAttack > timeBetweenAttacks)
             {   // This will trigger Hit()
                 GetComponent<Animator>().SetTrigger("attack");
