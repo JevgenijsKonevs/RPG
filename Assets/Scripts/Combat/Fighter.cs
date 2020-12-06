@@ -1,7 +1,7 @@
 using UnityEngine;
 using RPG.Movement;
 using RPG.Core;
-using RPG.Combat;
+
 
 namespace RPG.Combat
 {
@@ -67,6 +67,17 @@ namespace RPG.Combat
         {
             GetComponent<Animator>().SetTrigger("stopAttack");
             target = null;
+        }
+        
+        // fix to check if it is possible to attack the enemy
+        public bool CanAttack(CombatTarget combatTarget)
+        {
+            if (combatTarget == null)
+            {
+                return false;
+            }
+            Health targetToTest = combatTarget.GetComponent<Health>();
+            return targetToTest!=null &&!targetToTest.IsDead();
         }
 
     }
