@@ -9,13 +9,13 @@ namespace RPG.Control
     public class AIController : MonoBehaviour
     {
         [SerializeField] float chaseDistance = 5f;
-
+        [SerializeField] float suspicionTime = 3f;
         Fighter fighter;
         GameObject player;
         Health health;
         Mover mover;
         Vector3 guardPosition;
-
+        float timeSinceLastSawPlayer = Mathf.Infinity;
         private void Start()
         {
             fighter = GetComponent<Fighter>();
@@ -25,6 +25,8 @@ namespace RPG.Control
             mover = GetComponent<Mover>();
             // guards starting position
             guardPosition = transform.position;
+            // time since enemy saw a player
+            
         }
         private void Update()
         {
@@ -32,13 +34,34 @@ namespace RPG.Control
             // if player is in the area of chase then trigger chase action
             if (InAttackRangeOfPlayer() && fighter.CanAttack(player))
             {
-                fighter.Attack(player);
+                timeSinceLastSawPlayer = 0;
+                AttackBehaviour();
             }
+            // suspicion mode
+            else if (timeSinceLastSawPlayer < suspicionTime) 
+            {
+                SuspicionBehaviour();
+            }
+            // player is out of attack range and is not returning
             else
             {
                 // return to the guarding position
-                mover.StartMoveAction(guardPosition);
+                GuardBehaviour();
             }
+            // update the time
+            timeSinceLastSawPlayer += Time.deltaTime;
+        }
+        private void AttackBehaviour()
+        {
+            fighter.Attack(player);
+        }
+         private void SuspicionBehaviour()
+        {
+            GetComponent<ActionSchedule>().CancelCurrentAction();
+        }
+         private void GuardBehaviour()
+        {
+            mover.StartMoveAction(guardPosition);
         }
 
         private bool InAttackRangeOfPlayer()
