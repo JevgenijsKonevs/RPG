@@ -3,20 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using RPG.Combat;
 using RPG.Core;
+using RPG.Movement;
 namespace RPG.Control
 {
     public class AIController : MonoBehaviour
     {
         [SerializeField] float chaseDistance = 5f;
+
         Fighter fighter;
         GameObject player;
         Health health;
+        Mover mover;
+        Vector3 guardPosition;
+
         private void Start()
         {
             fighter = GetComponent<Fighter>();
             health = GetComponent<Health>();
             // find the object location with the tag "Player", which is assigned to Player model
             player = GameObject.FindWithTag("Player");
+            mover = GetComponent<Mover>();
+            // guards starting position
+            guardPosition = transform.position;
         }
         private void Update()
         {
@@ -28,7 +36,8 @@ namespace RPG.Control
             }
             else
             {
-                fighter.Cancel();
+                // return to the guarding position
+                mover.StartMoveAction(guardPosition);
             }
         }
 
@@ -38,6 +47,14 @@ namespace RPG.Control
             float distanceToPlayer = Vector3.Distance(player.transform.position, transform.position);
             return distanceToPlayer < chaseDistance;
         }
+        
+        // Called by Unity. To show what is the chase distance of enemy
+        private void OnDrawGizmosSelected() {
+            Gizmos.color = Color.blue;
+            // draw a blue sphere, when the enemy is selected
+            Gizmos.DrawWireSphere(transform.position, chaseDistance);
+        }
+
     }
 }
 
