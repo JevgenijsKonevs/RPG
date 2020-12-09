@@ -13,6 +13,10 @@ namespace RPG.Control
         [SerializeField] float suspicionTime = 3f;
         [SerializeField] PatrolPath patrolPath;
         [SerializeField] float waypointTolerance = 3f;
+        [SerializeField] float waypointDwellTime = 3f;
+        [Range(0,1)]
+        // percent of the enemmys maximum speed. (Mover.cs / maxSpeed)
+        [SerializeField] float patrolSpeedFraction = 0.2f;
 
         Fighter fighter;
         GameObject player;
@@ -21,6 +25,7 @@ namespace RPG.Control
         Vector3 guardPosition;
         
         float timeSinceLastSawPlayer = Mathf.Infinity;
+        float timeSinceArrivedAtWaypoint = Mathf.Infinity;
         int currentWaypointIndex = 0;
         private void Start()
         {
@@ -40,7 +45,7 @@ namespace RPG.Control
             // if player is in the area of chase then trigger chase action
             if (InAttackRangeOfPlayer() && fighter.CanAttack(player))
             {
-                timeSinceLastSawPlayer = 0;
+                
                 AttackBehaviour();
             }
             // suspicion mode
@@ -55,10 +60,16 @@ namespace RPG.Control
                 PatrolBehaviour();
             }
             // update the time
+            UpdateTimers();
+        }
+        private void UpdateTimers()
+        {
             timeSinceLastSawPlayer += Time.deltaTime;
+            timeSinceArrivedAtWaypoint += Time.deltaTime;
         }
         private void AttackBehaviour()
         {
+            timeSinceLastSawPlayer = 0;
             fighter.Attack(player);
         }
          private void SuspicionBehaviour()
@@ -72,11 +83,17 @@ namespace RPG.Control
             {
                 if (AtWaypoint())
                 {
+                    timeSinceArrivedAtWaypoint = 0;
                     CycleWaypoint();
                 }
                 nextPosition = GetCurrentWaypoint();
             }
-            mover.StartMoveAction(nextPosition);
+            // stopping for a certain time at the waypoints
+            if (timeSinceArrivedAtWaypoint > waypointDwellTime)
+            {
+                mover.StartMoveAction(nextPosition, patrolSpeedFraction);
+            }
+            
         }
         private bool AtWaypoint()
         {

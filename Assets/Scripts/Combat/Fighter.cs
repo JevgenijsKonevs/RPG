@@ -20,7 +20,8 @@ namespace RPG.Combat
             if (target.IsDead()) return;
             if (!GetIsInRange())
             { // if the player is out of range then move to attack target
-                GetComponent<Mover>().MoveTo(target.transform.position);
+                // 1f means going to full speed
+                GetComponent<Mover>().MoveTo(target.transform.position, 1f);
 
             }
             else
