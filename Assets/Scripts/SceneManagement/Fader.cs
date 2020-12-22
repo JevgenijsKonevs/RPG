@@ -11,6 +11,10 @@ namespace RPG.SceneManagement
         {
             canvasGroup = GetComponent<CanvasGroup>();
         }
+        public void FadeOutImmediate()
+        {
+            canvasGroup.alpha = 1;
+        }
 
         public IEnumerator FadeOut(float time)
         {   // while alpha parameter in Canvas Group, which is assigned to Fader in Unity, is less than 1

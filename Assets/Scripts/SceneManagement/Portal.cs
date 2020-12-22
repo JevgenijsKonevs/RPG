@@ -40,11 +40,23 @@ namespace RPG.SceneManagement
             // launch Fade out effect
             Fader fader = FindObjectOfType<Fader>();
             yield return fader.FadeOut(fadeOutTime);
+
+            // save current level
+            SavingWrapper wrapper = FindObjectOfType<SavingWrapper>();
+            wrapper.Save();
+
+
             // load the scene
             yield return SceneManager.LoadSceneAsync(sceneToLoad);
 
+
+            // Load current level
+            wrapper.Load();
+
             Portal otherPortal = GetOtherPortal();
             UpdatePlayer(otherPortal);
+
+            wrapper.Save();
             // launch Fade in effect
             yield return new WaitForSeconds(fadeWaitTime);
             yield return fader.FadeIn(fadeOutTime);

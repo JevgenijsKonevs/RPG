@@ -59,17 +59,31 @@ namespace RPG.Movement {
         float speed = localVelocity.z;
         GetComponent<Animator>().SetFloat("forwardSpeed",speed);
     }
-        // remember and capture the positions of the objects
+        // MoverSaveData for capturing and restoring object properties
+        [System.Serializable] 
+        struct MoverSaveData
+        {
+            public SerializableVector3 position;
+            public SerializableVector3 rotation;
+        }
+        // remember and capture the different parameters of the objects
         public object CaptureState()
         {
-            return new SerializableVector3(transform.position);
+            MoverSaveData data = new MoverSaveData();
+            // assigning the position of the objects 
+            data.position = new SerializableVector3(transform.position);
+            // assigning the rotation of the objects (eulerAngles means the vector representation of the rotation)
+            data.rotation = new SerializableVector3(transform.eulerAngles);
+            return data;
         }
-        // restore the positions
+    
+        // restore the position and rotation of the object
         public void RestoreState(object state)
         {
-            SerializableVector3 position = (SerializableVector3)state;
+            MoverSaveData data = (MoverSaveData)state;
             GetComponent<NavMeshAgent>().enabled = false;
-            transform.position = position.ToVector();
+            transform.position = data.position.ToVector();
+            transform.eulerAngles = data.rotation.ToVector();
             GetComponent<NavMeshAgent>().enabled = true;
         }
 }
