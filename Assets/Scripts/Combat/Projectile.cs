@@ -11,6 +11,10 @@ namespace RPG.Combat
 
         [SerializeField] float speed = 1f;
         [SerializeField] bool isHoming = true;
+        [SerializeField] GameObject hitEffect = null;
+        [SerializeField] float maxLifeTime = 10;
+        [SerializeField] GameObject[] destroyOnHit= null;
+        [SerializeField] float lifeAfterImpact = 2;
         Health target = null;
         float damage = 0;
         private void Start()
@@ -34,6 +38,8 @@ namespace RPG.Combat
         {
             this.target = target;
             this.damage = damage;
+            // destroy projectile after maxLifeTime value. 
+            Destroy(gameObject, maxLifeTime);
         }
         private Vector3 GetAimLocation()
         {
@@ -50,8 +56,18 @@ namespace RPG.Combat
             }
             if (target.IsDead()) return;
             target.TakeDamage(damage);
+            speed = 0;
+
+            if (hitEffect != null)
+            {
+                Instantiate(hitEffect, GetAimLocation(), transform.rotation);
+            }
+            foreach (GameObject toDestroy in destroyOnHit)
+            {
+                Destroy(toDestroy);
+            }
             // destroy the arrow that was shot
-            Destroy(gameObject);
+            Destroy(gameObject, lifeAfterImpact);
         }
     }
 }
