@@ -10,15 +10,23 @@ namespace RPG.Combat
     {
 
         [SerializeField] float speed = 1f;
+        [SerializeField] bool isHoming = true;
         Health target = null;
         float damage = 0;
+        private void Start()
+        {
+            transform.LookAt(GetAimLocation());
+        }
 
         // Update is called once per frame
         void Update()
         {
             if (target == null) return;
-            // point the projectile to the targets position
+            if (isHoming && !target.IsDead())
+            {
+                 // point the projectile to the targets position
             transform.LookAt(GetAimLocation());
+            }
             // move the projectile with the given speed to the targets position
             transform.Translate(Vector3.forward * speed * Time.deltaTime);
         }
@@ -40,6 +48,7 @@ namespace RPG.Combat
             {
                 return;
             }
+            if (target.IsDead()) return;
             target.TakeDamage(damage);
             // destroy the arrow that was shot
             Destroy(gameObject);
